@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Global Hunger Risk Explorer — Interactive D3.js dashboard exploring undernourishment patterns across countries, regions and years (2001–2022). SDG 2 Zero Hunger.">
+    <title>Global Hunger Risk Explorer | SDG 2 Zero Hunger</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- D3.js v7 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Loading overlay (hidden once data loads) -->
+    <div id="loading" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading dashboard data…</div>
+    </div>
+
+    <!-- Main dashboard (hidden until data loads) -->
+    <div id="dashboard" class="dashboard-container" style="display:none;">
+
+        <!-- ── Header ───────────────────────────────────────────────── -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1>Global Hunger Risk Explorer</h1>
+                <p class="subtitle">Tracking Undernourishment and Food Security Vulnerability from 2001 to 2022</p>
+            </div>
+            <div class="sdg-badge">
+                <div class="sdg-badge-icon">2</div>
+                <div class="sdg-badge-text">
+                    <strong>Zero Hunger</strong>
+                    End hunger, achieve food security and improved nutrition and promote sustainable agriculture
+                </div>
+            </div>
+        </header>
+
+        <!-- ── Controls Bar ─────────────────────────────────────────── -->
+        <div class="controls-bar">
+            <!-- Year -->
+            <div class="control-group">
+                <label for="yearSlider">Year</label>
+                <span id="yearDisplay" class="year-display">2012</span>
+                <button id="btnPlay" class="btn-play" title="Play/Pause animation" aria-label="Play animation">▶</button>
+                <input type="range" id="yearSlider" class="year-slider"
+                       min="2001" max="2022" value="2012" step="1">
+            </div>
+
+            <!-- Region -->
+            <div class="control-group">
+                <label for="regionSelect">Region</label>
+                <select id="regionSelect" class="control-select">
+                    <option value="All">All Regions</option>
+                </select>
+            </div>
+
+            <!-- Metric -->
+            <div class="control-group">
+                <label for="metricSelect">Metric</label>
+                <select id="metricSelect" class="control-select">
+                    <option value="undernourishment_pct">Undernourishment (%)</option>
+                    <option value="food_production_index">Food Production Index</option>
+                    <option value="cereal_yield_kg_per_ha">Cereal Yield (kg/ha)</option>
+                    <option value="fao_dietary_energy_adequacy_pct">Dietary Energy Adequacy (%)</option>
+                </select>
+            </div>
+
+            <!-- Country Search -->
+            <div class="control-group search-wrapper">
+                <label for="countrySearch">Country Search</label>
+                <input type="text" id="countrySearch" class="control-input"
+                       placeholder="Search country…" autocomplete="off">
+                <span class="search-icon">🔍</span>
+                <div id="searchSuggestions" class="search-suggestions"></div>
+            </div>
+
+            <div class="controls-spacer"></div>
+
+            <!-- Reset -->
+            <button id="btnReset" class="btn-reset" title="Reset all filters">
+                ↺ Reset
+            </button>
+        </div>
+
+        <!-- ── Dashboard Grid ───────────────────────────────────────── -->
+        <div class="dashboard-grid">
+
+            <!-- 1. World Map (placeholder) -->
+            <div class="chart-card chart-card--map">
+                <div class="chart-card-header">
+                    <h3>1. Animated Choropleth World Map</h3>
+                </div>
+                <div class="chart-container" id="chart-map"></div>
+            </div>
+
+            <!-- 3. Top 10 Risk Countries Bar Chart -->
+            <div class="chart-card chart-card--bar">
+                <div class="chart-card-header">
+                    <h3>3. Top 10 Risk Countries <span class="chart-subtitle">(by Undernourishment %)</span></h3>
+                    <select id="barSortMode">
+                        <option value="highest">Highest Undernourishment</option>
+                        <option value="improved">Most Improved (YoY)</option>
+                        <option value="worsened">Most Worsened (YoY)</option>
+                    </select>
+                </div>
+                <div class="chart-container" id="chart-bar"></div>
+            </div>
+
+            <!-- 2. Regional Trend Line Chart -->
+            <div class="chart-card chart-card--line">
+                <div class="chart-card-header">
+                    <h3>2. Regional Trend Line Chart</h3>
+                </div>
+                <div class="chart-container" id="chart-line"></div>
+            </div>
+
+            <!-- 4. Country-Year Heatmap -->
+            <div class="chart-card chart-card--heatmap">
+                <div class="chart-card-header">
+                    <h3>4. Country-Year Heatmap <span class="chart-subtitle">(Undernourishment %)</span></h3>
+                </div>
+                <div class="chart-container" id="chart-heatmap"></div>
+            </div>
+
+            <!-- 5. Food Production vs Undernourishment Scatter Plot -->
+            <div class="chart-card chart-card--scatter">
+                <div class="chart-card-header">
+                    <h3>5. Food Production vs Undernourishment</h3>
+                </div>
+                <div class="chart-container" id="chart-scatter"></div>
+            </div>
+
+            <!-- 6. Income Group Distribution Box Plot -->
+            <div class="chart-card chart-card--boxplot">
+                <div class="chart-card-header">
+                    <h3>6. Income Group Distribution <span class="chart-subtitle">(Undernourishment %)</span></h3>
+                </div>
+                <div class="chart-container" id="chart-boxplot"></div>
+            </div>
+
+            <!-- Selected Country Summary -->
+            <div class="chart-card chart-card--summary">
+                <div class="summary-card" id="countrySummary">
+                    <div class="summary-title">Selected Country</div>
+                    <div class="summary-empty">Click on a country in any chart to view details</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ── Footer ───────────────────────────────────────────────── -->
+        <footer class="dashboard-footer">
+            <span>Source: Global Food Security Intelligence Dataset (World Bank WDI API &amp; FAOSTAT)</span>
+            <span>Data period: 2001 – 2022 &nbsp;│&nbsp; Dashboard built with D3.js</span>
+        </footer>
+
+    </div>
+
+    <!-- ── Scripts (load order matters) ─────────────────────────────── -->
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/charts/map.js"></script>
+    <script src="js/charts/lineChart.js"></script>
+    <script src="js/charts/barChart.js"></script>
+    <script src="js/charts/heatmap.js"></script>
+    <script src="js/charts/scatterPlot.js"></script>
+    <script src="js/charts/boxPlot.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
