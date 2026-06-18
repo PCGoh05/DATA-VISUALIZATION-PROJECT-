@@ -116,6 +116,13 @@
             els.metricSelect.value = DashboardState.DEFAULTS.selectedMetric;
             els.countrySearch.value = '';
             els.searchSuggestions.classList.remove('active');
+            
+            const sortSelect = document.getElementById('barSortMode');
+            if (sortSelect) {
+                sortSelect.value = 'highest';
+                sortSelect.dispatchEvent(new Event('change'));
+            }
+            
             updateSliderProgress();
             stopPlay();
         });
