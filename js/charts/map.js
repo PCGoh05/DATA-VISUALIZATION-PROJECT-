@@ -56,7 +56,7 @@ const MapChart = (() => {
 
         const rect = container.getBoundingClientRect();
         width = rect.width;
-        height = Math.max(350, rect.height);
+        height = Math.max(400, rect.height);
 
         // Load GeoJSON
         try {
@@ -70,6 +70,9 @@ const MapChart = (() => {
             return;
         }
 
+        // Filter out Antarctica to reduce empty space at the bottom
+        geoData.features = geoData.features.filter(f => getGeoName(f) !== 'Antarctica');
+
         // Create SVG
         svg = d3.select(`#${CONTAINER_ID}`)
             .append('svg')
@@ -79,10 +82,10 @@ const MapChart = (() => {
 
         g = svg.append('g');
 
-        // Projection
+        // Projection (fit slightly larger to reduce bottom padding)
         projection = d3.geoNaturalEarth1()
-            .fitSize([width - 20, height - 40], geoData)
-            .translate([width / 2, height / 2]);
+            .fitSize([width, height + 40], geoData)
+            .translate([width / 2, (height / 2) - 20]);
 
         pathGenerator = d3.geoPath().projection(projection);
 
@@ -172,27 +175,35 @@ const MapChart = (() => {
             .attr('rx', 2);
 
         legendGroup.append('text')
+            .attr('x', legendWidth / 2).attr('y', -6)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '0.7rem')
+            .style('fill', 'var(--text-primary)')
+            .style('font-weight', '500')
+            .text('Undernourishment (%)');
+
+        legendGroup.append('text')
             .attr('x', 0).attr('y', 22)
             .style('font-size', '0.6rem')
             .style('fill', 'var(--text-secondary)')
-            .text('0%');
+            .text('Low risk');
 
         legendGroup.append('text')
             .attr('x', legendWidth).attr('y', 22)
             .attr('text-anchor', 'end')
             .style('font-size', '0.6rem')
             .style('fill', 'var(--text-secondary)')
-            .text('≥ 50%');
+            .text('High risk');
 
         // No data swatch
         legendGroup.append('rect')
-            .attr('x', legendWidth + 12).attr('y', 0)
+            .attr('x', legendWidth + 20).attr('y', 0)
             .attr('width', legendHeight).attr('height', legendHeight)
             .attr('fill', Utils.getNoDataColor()).attr('rx', 2)
             .attr('stroke', 'rgba(255,255,255,0.1)');
 
         legendGroup.append('text')
-            .attr('x', legendWidth + 26).attr('y', 9)
+            .attr('x', legendWidth + 34).attr('y', 9)
             .style('font-size', '0.6rem')
             .style('fill', 'var(--text-secondary)')
             .text('No data');
@@ -242,10 +253,10 @@ const MapChart = (() => {
 
         const countryName = (row && row.country_name) || getGeoName(feature) || 'Unknown';
         const undernourishment = (row && row.undernourishment_pct != null)
-            ? Utils.formatValue(row.undernourishment_pct) + '%' : 'No data';
+            ? Utils.formatValue(row.undernourishment_pct) + '%' : 'No data available';
         const foodProd = (row && row.food_production_index != null)
-            ? Utils.formatValue(row.food_production_index) : 'No data';
-        const region = (row && row.region) || 'No data';
+            ? Utils.formatValue(row.food_production_index) : 'No data available';
+        const region = (row && row.region) || 'No data available';
 
         const html = `
             <strong>${countryName}</strong> (${state.selectedYear})<br>
@@ -297,6 +308,34 @@ const MapChart = (() => {
         if (needsColorUpdate) {
             updateColors(state, true);
         }
+
+        if (changedKeys.includes('selectedCountry') || changedKeys.includes('_init')) {
+            if (state.selectedCountry) {
+                zoomToCountry(state.selectedCountry);
+            } else {
+                svg.transition().duration(750).call(zoomBehavior.transform, d3.zoomIdentity);
+            }
+        }
+    }
+
+    function zoomToCountry(iso3) {
+        if (!g || !geoData) return;
+        const feature = geoData.features.find(f => getGeoIso3(f) === iso3);
+        if (!feature) return;
+
+        const bounds = pathGenerator.bounds(feature);
+        const dx = bounds[1][0] - bounds[0][0];
+        const dy = bounds[1][1] - bounds[0][1];
+        const x = (bounds[0][0] + bounds[1][0]) / 2;
+        const y = (bounds[0][1] + bounds[1][1]) / 2;
+
+        const scale = Math.max(1, Math.min(8, 0.5 / Math.max(dx / width, dy / height)));
+        const translate = [width / 2 - scale * x, height / 2 - scale * y];
+
+        svg.transition().duration(750).call(
+            zoomBehavior.transform,
+            d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
+        );
     }
 
     return { init, update };
