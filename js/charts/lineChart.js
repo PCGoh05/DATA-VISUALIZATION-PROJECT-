@@ -187,7 +187,7 @@ const LineChart = (() => {
                 d3.select(this)
                     .attr('stroke-dasharray', totalLength)
                     .attr('stroke-dashoffset', totalLength)
-                    .transition()
+                    .transition('draw')
                     .duration(1500)
                     .ease(d3.easeCubicInOut)
                     .attr('stroke-dashoffset', 0);
@@ -336,12 +336,12 @@ const LineChart = (() => {
         const x = xScale(year);
 
         refLine
-            .transition().duration(300)
+            .transition('refLine').duration(300)
             .attr('x1', x)
             .attr('x2', x);
 
         refLineLabel
-            .transition().duration(300)
+            .transition('refLineLabel').duration(300)
             .attr('x', x)
             .text(year);
     }
@@ -350,7 +350,7 @@ const LineChart = (() => {
         if (!g) return;
 
         g.selectAll('.region-line')
-            .transition().duration(300)
+            .transition('highlight').duration(300)
             .attr('stroke-width', d => {
                 if (selectedRegion === 'All') return 2.5;
                 return d.region === selectedRegion ? 3.5 : 1;

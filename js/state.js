@@ -8,7 +8,7 @@
 const DashboardState = (() => {
     // ── Default values ─────────────────────────────────────────────────────
     const DEFAULTS = {
-        selectedYear: 2012,
+        selectedYear: 2022,
         selectedRegion: 'All',
         selectedCountry: null,      // iso3 code or null
         selectedMetric: 'undernourishment_pct',
@@ -69,7 +69,7 @@ const DashboardState = (() => {
      * Reset all state values to defaults and notify listeners.
      */
     function resetState() {
-        setState({ ...DEFAULTS });
+        setState({ ...DEFAULTS, _init: Date.now() });
     }
 
     return { subscribe, setState, getState, resetState, DEFAULTS };
