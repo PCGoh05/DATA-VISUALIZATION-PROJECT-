@@ -99,31 +99,33 @@ const BarChart = (() => {
                 }));
         } else if (currentSortMode === 'improved') {
             // Most Improved: most negative yoy_change → greatest improvement
+            // Filter to only negative values (actual improvements) and use absolute magnitude for bars
             ranked = filtered
-                .filter(d => d.undernourishment_yoy_change_pp != null)
+                .filter(d => d.undernourishment_yoy_change_pp != null && d.undernourishment_yoy_change_pp < 0)
                 .sort((a, b) => a.undernourishment_yoy_change_pp - b.undernourishment_yoy_change_pp)
                 .slice(0, BAR_COUNT)
                 .map((d, i) => ({
                     iso3: d.iso3,
                     country_name: d.country_name,
                     region: d.region,
-                    value: Math.abs(d.undernourishment_yoy_change_pp),
+                    value: Math.abs(d.undernourishment_yoy_change_pp),  // positive magnitude for bar width
                     rawValue: d.undernourishment_yoy_change_pp,
                     rank: i + 1,
-                    label: d.undernourishment_yoy_change_pp.toFixed(1) + ' pp',
+                    label: d.undernourishment_yoy_change_pp.toFixed(1) + ' pp',  // original negative value
                     metricName: 'YoY Change'
                 }));
         } else {
             // Most Worsened: most positive yoy_change → greatest worsening
+            // Filter to only positive values (actual worsening)
             ranked = filtered
-                .filter(d => d.undernourishment_yoy_change_pp != null)
+                .filter(d => d.undernourishment_yoy_change_pp != null && d.undernourishment_yoy_change_pp > 0)
                 .sort((a, b) => b.undernourishment_yoy_change_pp - a.undernourishment_yoy_change_pp)
                 .slice(0, BAR_COUNT)
                 .map((d, i) => ({
                     iso3: d.iso3,
                     country_name: d.country_name,
                     region: d.region,
-                    value: d.undernourishment_yoy_change_pp,
+                    value: d.undernourishment_yoy_change_pp,  // already positive
                     rawValue: d.undernourishment_yoy_change_pp,
                     rank: i + 1,
                     label: '+' + d.undernourishment_yoy_change_pp.toFixed(1) + ' pp',
@@ -226,7 +228,7 @@ const BarChart = (() => {
             .transition(t)
             .attr('y', d => yScale(d.country_name))
             .attr('height', yScale.bandwidth())
-            .attr('width', d => xScale(d.value))
+            .attr('width', d => Math.max(0, xScale(d.value)))
             .attr('fill', d => {
                 if (currentSortMode === 'highest') {
                     return colorScale(d.value);
