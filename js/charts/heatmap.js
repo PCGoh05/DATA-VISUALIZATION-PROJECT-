@@ -14,7 +14,7 @@ const HeatmapChart = (() => {
     let width, height;
     let yearHighlightGroup;
 
-    const margin = { top: 30, right: 30, bottom: 40, left: 130 };
+    const margin = { top: 45, right: 30, bottom: 55, left: 130 };
     const CONTAINER_ID = 'chart-heatmap';
     const MAX_COUNTRIES = 20;
 
@@ -136,7 +136,7 @@ const HeatmapChart = (() => {
             .style('fill', 'var(--text-secondary)')
             .style('font-size', '0.7rem')
             .style('text-anchor', 'start')
-            .attr('dx', '0.5em')
+            .attr('dx', '0.8em')
             .attr('dy', '0em')
             .attr('transform', 'rotate(-45)');
             
@@ -252,7 +252,7 @@ const HeatmapChart = (() => {
         
         const legendGroup = svg.append('g')
             .attr('class', 'heatmap-legend')
-            .attr('transform', `translate(${width + margin.left - legendWidth}, ${height + margin.top + 25})`);
+            .attr('transform', `translate(${width + margin.left - legendWidth}, ${height + margin.top + 20})`);
             
         const defs = svg.append('defs');
         const linearGradient = defs.append('linearGradient')
