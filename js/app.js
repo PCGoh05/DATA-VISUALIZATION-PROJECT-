@@ -42,7 +42,7 @@
             els.dashboard.style.display = 'block';
 
             // Now init charts (getBoundingClientRect needs visible containers)
-            initCharts();
+            await initCharts();
             subscribeToState();
 
             // Trigger initial render (use _init to force notification even if year hasn't changed)
@@ -250,10 +250,9 @@
     }
 
     // ── Initialize Charts ──────────────────────────────────────────────────
-    function initCharts() {
+    async function initCharts() {
         // Each chart module exposes an init(data) and update(state, changedKeys) function.
-        // They will be initialized here once implemented.
-        if (typeof MapChart !== 'undefined')      MapChart.init(dashboardData);
+        if (typeof MapChart !== 'undefined')      await MapChart.init(dashboardData);
         if (typeof LineChart !== 'undefined')      LineChart.init(dashboardData);
         if (typeof BarChart !== 'undefined')       BarChart.init(dashboardData);
         if (typeof HeatmapChart !== 'undefined')   HeatmapChart.init(dashboardData);
