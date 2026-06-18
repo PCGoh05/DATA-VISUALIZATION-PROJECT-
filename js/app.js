@@ -106,10 +106,12 @@
 
         // Reset
         els.btnReset.addEventListener('click', () => {
+            stopPlay();
             DashboardState.resetState();
+            
             els.yearSlider.value = DashboardState.DEFAULTS.selectedYear;
             els.yearDisplay.textContent = DashboardState.DEFAULTS.selectedYear;
-            els.regionSelect.value = 'All';
+            els.regionSelect.value = DashboardState.DEFAULTS.selectedRegion;
 
             els.countrySearch.value = '';
             els.searchSuggestions.classList.remove('active');
@@ -121,7 +123,6 @@
             }
             
             updateSliderProgress();
-            stopPlay();
         });
 
         // Window resize
@@ -150,11 +151,22 @@
     }
 
     function startPlay() {
+        const maxYear = parseInt(els.yearSlider.max);
+        const minYear = parseInt(els.yearSlider.min);
+        
+        let current = DashboardState.getState().selectedYear;
+        // If at the end, restart from the beginning
+        if (current >= maxYear) {
+            current = minYear;
+            els.yearSlider.value = current;
+            els.yearDisplay.textContent = current;
+            updateSliderProgress();
+            DashboardState.setState({ selectedYear: current });
+        }
+
         DashboardState.setState({ isPlaying: true });
         els.btnPlay.textContent = '⏸';
         els.btnPlay.title = 'Pause animation';
-
-        const maxYear = parseInt(els.yearSlider.max);
 
         playInterval = setInterval(() => {
             const current = DashboardState.getState().selectedYear;

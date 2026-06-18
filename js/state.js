@@ -8,7 +8,7 @@
 const DashboardState = (() => {
     // ── Default values ─────────────────────────────────────────────────────
     const DEFAULTS = {
-        selectedYear: 2022,
+        selectedYear: 2001,
         selectedRegion: 'All',
         selectedCountry: null,      // iso3 code or null
         isPlaying: false
