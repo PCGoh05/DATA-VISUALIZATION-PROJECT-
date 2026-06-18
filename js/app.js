@@ -20,7 +20,7 @@
         yearDisplay:     document.getElementById('yearDisplay'),
         btnPlay:         document.getElementById('btnPlay'),
         regionSelect:    document.getElementById('regionSelect'),
-        metricSelect:    document.getElementById('metricSelect'),
+
         countrySearch:   document.getElementById('countrySearch'),
         searchSuggestions: document.getElementById('searchSuggestions'),
         btnReset:        document.getElementById('btnReset'),
@@ -92,10 +92,7 @@
             DashboardState.setState({ selectedRegion: els.regionSelect.value });
         });
 
-        // Metric
-        els.metricSelect.addEventListener('change', () => {
-            DashboardState.setState({ selectedMetric: els.metricSelect.value });
-        });
+
 
         // Country search
         els.countrySearch.addEventListener('input', onSearchInput);
@@ -113,7 +110,7 @@
             els.yearSlider.value = DashboardState.DEFAULTS.selectedYear;
             els.yearDisplay.textContent = DashboardState.DEFAULTS.selectedYear;
             els.regionSelect.value = 'All';
-            els.metricSelect.value = DashboardState.DEFAULTS.selectedMetric;
+
             els.countrySearch.value = '';
             els.searchSuggestions.classList.remove('active');
             

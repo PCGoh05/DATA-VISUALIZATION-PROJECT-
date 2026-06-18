@@ -11,7 +11,6 @@ const DashboardState = (() => {
         selectedYear: 2022,
         selectedRegion: 'All',
         selectedCountry: null,      // iso3 code or null
-        selectedMetric: 'undernourishment_pct',
         isPlaying: false
     };
 
