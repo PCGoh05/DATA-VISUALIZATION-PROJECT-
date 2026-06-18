@@ -43,8 +43,8 @@
             els.loading.style.display = 'none';
             els.dashboard.style.display = 'block';
 
-            // Trigger initial render
-            DashboardState.setState({ selectedYear: DashboardState.getState().selectedYear });
+            // Trigger initial render (use _init to force notification even if year hasn't changed)
+            DashboardState.setState({ _init: true });
 
         } catch (err) {
             console.error('Failed to initialize dashboard:', err);
