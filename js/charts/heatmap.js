@@ -134,7 +134,11 @@ const HeatmapChart = (() => {
             .call(d3.axisTop(xScale).tickSize(0).tickPadding(5))
             .selectAll('text')
             .style('fill', 'var(--text-secondary)')
-            .style('font-size', '0.7rem');
+            .style('font-size', '0.7rem')
+            .style('text-anchor', 'start')
+            .attr('dx', '0.5em')
+            .attr('dy', '0em')
+            .attr('transform', 'rotate(-45)');
             
         g.select('.x-axis .domain').remove();
 
@@ -274,7 +278,7 @@ const HeatmapChart = (() => {
             .attr('y', 22)
             .style('font-size', '0.65rem')
             .style('fill', 'var(--text-secondary)')
-            .text('0%');
+            .text('Lower Risk (0%)');
             
         legendGroup.append('text')
             .attr('x', legendWidth)
@@ -282,16 +286,9 @@ const HeatmapChart = (() => {
             .attr('text-anchor', 'end')
             .style('font-size', '0.65rem')
             .style('fill', 'var(--text-secondary)')
-            .text('> 50%');
+            .text('Higher Risk (> 50%)');
             
-        legendGroup.append('text')
-            .attr('x', legendWidth / 2)
-            .attr('y', 22)
-            .attr('text-anchor', 'middle')
-            .style('font-size', '0.65rem')
-            .style('fill', 'var(--text-secondary)')
-            .text('Undernourishment');
-            
+
         // No data legend
         const noDataGroup = legendGroup.append('g')
             .attr('transform', `translate(-70, 0)`);
