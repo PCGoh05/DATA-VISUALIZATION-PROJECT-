@@ -133,7 +133,13 @@
             <!-- 5. Food Production vs Undernourishment Scatter Plot -->
             <div class="chart-card chart-card--scatter">
                 <div class="chart-card-header">
-                    <h3>5. Food Production vs Undernourishment</h3>
+                    <h3>5. Food Security Factors vs Undernourishment <span class="chart-subtitle">(Association)</span></h3>
+                    <select id="scatterXAxis" class="control-select">
+                        <option value="food_production_index">Food Production Index</option>
+                        <option value="cereal_yield_kg_per_ha">Cereal Yield (kg/ha)</option>
+                        <option value="fao_dietary_energy_adequacy_pct">Dietary Energy Adequacy (%)</option>
+                        <option value="fao_protein_supply_g_per_day">Protein Supply (g/day)</option>
+                    </select>
                 </div>
                 <div class="chart-container" id="chart-scatter"></div>
             </div>
