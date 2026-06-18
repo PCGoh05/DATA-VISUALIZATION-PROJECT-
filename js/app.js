@@ -35,13 +35,15 @@
 
             populateControls();
             wireControls();
-            initCharts();
-            subscribeToState();
             updateSliderProgress();
 
-            // Show dashboard, hide loading
+            // Show dashboard BEFORE chart init so containers have real dimensions
             els.loading.style.display = 'none';
             els.dashboard.style.display = 'block';
+
+            // Now init charts (getBoundingClientRect needs visible containers)
+            initCharts();
+            subscribeToState();
 
             // Trigger initial render (use _init to force notification even if year hasn't changed)
             DashboardState.setState({ _init: true });
