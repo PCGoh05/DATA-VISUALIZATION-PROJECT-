@@ -142,6 +142,32 @@ const BarChart = (() => {
 
         const data = getTopCountries(state);
 
+        // ── Empty State ──
+        g.selectAll('.bar-empty-msg').remove();
+        if (data.length === 0) {
+            // Clear any lingering bars and labels
+            g.selectAll('.bar').remove();
+            g.selectAll('.bar-label').remove();
+            g.select('.x-axis').call(d3.axisBottom(xScale.domain([0, 1])).ticks(0).tickFormat(''));
+            g.select('.y-axis').call(d3.axisLeft(yScale.domain([])));
+
+            const modeLabel = currentSortMode === 'improved'
+                ? 'Most Improved (YoY)'
+                : currentSortMode === 'worsened'
+                    ? 'Most Worsened (YoY)'
+                    : 'this selection';
+
+            g.append('text')
+                .attr('class', 'bar-empty-msg')
+                .attr('x', width / 2)
+                .attr('y', height / 2)
+                .attr('text-anchor', 'middle')
+                .style('fill', 'var(--text-muted)')
+                .style('font-size', '0.85rem')
+                .text(`No data available for "${modeLabel}" in ${state.selectedYear}.`);
+            return;
+        }
+
         // Update scales
         const maxVal = d3.max(data, d => d.value) || 10;
         xScale.domain([0, maxVal * 1.15]);
@@ -268,6 +294,7 @@ const BarChart = (() => {
         // Highlight selected country
         highlightSelected(state.selectedCountry);
     }
+
 
     // ── Highlight Selected Country ─────────────────────────────────────────
     function highlightSelected(selectedCountry) {
