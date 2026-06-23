@@ -99,10 +99,10 @@ const Utils = (() => {
     // ── Formatting ─────────────────────────────────────────────────────────
 
     /**
-     * Format a value for display. Returns "No data" for null/NaN.
+     * Format a value for display. Returns "No data available" for null/NaN.
      */
     function formatValue(v, decimals = 1) {
-        if (v == null || isNaN(v)) return 'No data';
+        if (v == null || isNaN(v)) return 'No data available';
         return Number(v).toLocaleString(undefined, {
             minimumFractionDigits: decimals,
             maximumFractionDigits: decimals

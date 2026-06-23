@@ -14,6 +14,8 @@ const MapChart = (() => {
     let geoData = null;
     let svg, g, projection, pathGenerator, colorScale, zoomBehavior;
     let width, height;
+    let regionByIso3 = new Map();
+    let regionNoteEl = null;
     let dataByIso3Year = new Map(); // key: "iso3-year" → row
 
     const CONTAINER_ID = 'chart-map';
@@ -45,6 +47,9 @@ const MapChart = (() => {
         for (const row of allData) {
             if (row.iso3 && row.year != null) {
                 dataByIso3Year.set(`${row.iso3}-${row.year}`, row);
+            }
+            if (row.iso3 && row.region && !regionByIso3.has(row.iso3)) {
+                regionByIso3.set(row.iso3, row.region);
             }
         }
 
@@ -117,9 +122,18 @@ const MapChart = (() => {
 
         // Zoom controls
         addZoomControls();
+        addRegionNote();
 
         // Legend
         drawLegend();
+    }
+
+    function addRegionNote() {
+        regionNoteEl = d3.select(`#${CONTAINER_ID}`)
+            .append('div')
+            .attr('class', 'map-region-note')
+            .style('display', 'none')
+            .text('Selected region is highlighted; other regions are dimmed for context.');
     }
 
     // ── Zoom Controls ──────────────────────────────────────────────────────
@@ -224,20 +238,30 @@ const MapChart = (() => {
                     ? colorScale(row.undernourishment_pct)
                     : Utils.getNoDataColor();
 
+                const countryRegion = (row && row.region) || regionByIso3.get(iso3);
+                const isOutsideSelectedRegion = state.selectedRegion !== 'All'
+                    && countryRegion !== state.selectedRegion;
                 const isSelected = state.selectedCountry && state.selectedCountry === iso3;
+                const opacity = isOutsideSelectedRegion && !isSelected ? 0.25 : 1;
 
                 const el = d3.select(this);
                 if (animate) {
                     el.transition(t)
                         .attr('fill', fillColor)
                         .attr('stroke', isSelected ? 'var(--accent-gold)' : 'rgba(255,255,255,0.15)')
-                        .attr('stroke-width', isSelected ? 2 : 0.5);
+                        .attr('stroke-width', isSelected ? 2 : 0.5)
+                        .attr('opacity', opacity);
                 } else {
                     el.attr('fill', fillColor)
                         .attr('stroke', isSelected ? 'var(--accent-gold)' : 'rgba(255,255,255,0.15)')
-                        .attr('stroke-width', isSelected ? 2 : 0.5);
+                        .attr('stroke-width', isSelected ? 2 : 0.5)
+                        .attr('opacity', opacity);
                 }
             });
+
+        if (regionNoteEl) {
+            regionNoteEl.style('display', state.selectedRegion === 'All' ? 'none' : 'block');
+        }
     }
 
     // ── Mouse Events ───────────────────────────────────────────────────────
@@ -340,4 +364,3 @@ const MapChart = (() => {
 
     return { init, update };
 })();
-

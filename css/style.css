@@ -710,6 +710,21 @@ body {
     gap: 5px;
 }
 
+.map-region-note {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    max-width: 260px;
+    padding: 6px 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid var(--border-card);
+    color: var(--text-secondary);
+    font-size: 0.68rem;
+    line-height: 1.35;
+    pointer-events: none;
+}
+
 .zoom-btn {
     width: 30px;
     height: 30px;

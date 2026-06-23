@@ -240,7 +240,6 @@ const BarChart = (() => {
                 Utils.showTooltip(event, html);
             })
             .on('mousemove', (event) => {
-                Utils.showTooltip(event, null); // reposition
                 const tip = Utils.getTooltip();
                 tip.style('left', (event.pageX + 15) + 'px')
                    .style('top', (event.pageY - 10) + 'px');

@@ -184,7 +184,7 @@ const HeatmapChart = (() => {
                     .attr('stroke', 'var(--text-primary)')
                     .attr('stroke-width', 2);
 
-                const valStr = d.value != null ? Utils.formatValue(d.value) + '%' : 'No data';
+                const valStr = d.value != null ? Utils.formatValue(d.value) + '%' : 'No data available';
                 const html = `
                     <strong>${d.country_name}</strong> (${d.year})<br>
                     <span class="tt-label">Region:</span> <span class="tt-value">${d.region}</span><br>

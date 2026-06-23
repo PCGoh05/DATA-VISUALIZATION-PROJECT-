@@ -86,7 +86,7 @@ const ScatterPlot = (() => {
             document.getElementById('btnReset')?.addEventListener('click', () => {
                 selectEl.value = 'food_production_index';
                 currentXMetric = 'food_production_index';
-                // Render will be triggered by state change
+                renderScatter(DashboardState.getState(), true);
             });
         }
     }
